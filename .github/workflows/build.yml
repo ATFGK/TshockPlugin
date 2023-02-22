@@ -47,8 +47,7 @@ jobs:
     - name: Set env output and package
       id: setenvo
       run: |
-          Copy-Item ./ConsoleApp1/bin/Debug/net6.0/* ./
-          Compress-Archive -Path ConsoleApp1.*,aaa.txt,README.md Artifact.zip
+          Compress-Archive -Path ./ConsoleApp1/bin/Debug/net6.0/*.*,aaa.txt,README.md Artifact.zip
 
         
     - name: 将包修改添加到发布
