@@ -45,29 +45,8 @@ jobs:
     - name: Set env output and package
       id: setenvo
       run: |
-          Copy-Item ./ConsoleApp1/bin/Debug/net6.0/* ./
           Compress-Archive -Path ConsoleApp1.*,aaa.txt,README.md Artifact.zip
 
-
-    - name: Create Test Report
-      uses: irongut/CodeCoverageSummary@v1.2.0
-      with:
-        filename: coverage/coverage.cobertura.xml
-        badge: true
-        format: 'markdown'
-        output: 'both'
-
-    - name: Upload Nuget Artifact
-      uses: actions/upload-artifact@v2.2.4
-      with:
-        name: release-nuget
-        path: ConsoleApp1/bin/Release/ConsoleApp1.Library*.nupkg
-
-    - name: Upload Test Report Artifact
-      uses: actions/upload-artifact@v2.2.4
-      with:
-        name: release-nuget
-        path: code-coverage-results.md
         
     - name: 将包修改添加到发布
       uses: irongut/EditRelease@v1.2.0
