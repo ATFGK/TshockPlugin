@@ -7,12 +7,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     
-    name: 修改备注
     steps:
      - uses: actions/checkout@v3
        with:
           submodules: 'recursive'
-     - name: 将包修改添加到发布
+          
+     - name: 修改预发布的备注
        uses: irongut/EditRelease@v1.2.0
        with:
          token: ${{ secrets.GITHUB_TOKEN }}
