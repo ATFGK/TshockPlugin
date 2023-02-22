@@ -23,39 +23,11 @@ jobs:
       with:
         dotnet-version: 6.0.x
         
-        
-    - name: 上传项目
-      uses: actions/upload-artifact@v2.2.4
-      with:
-        name: release-nuget
-        path: aaa.txt
-        
-  deploy:
-    name: 部署到GitHub包
-    needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-    - name: 下载工件
-      uses: actions/download-artifact@v2
-      with:
-        name: release-nuget
-
-    - name: 安装Nuget
-      uses: NuGet/setup-nuget@v1.0.5
-      with:
-        nuget-version: latest
-
-    - name: 添加GitHub包源
-      run: nuget sources Add -Name GitHub -Source ${{env.GITHUB_PACKAGE_URL}} -UserName ${{ github.repository_owner }} -Password ${{ secrets.GITHUB_TOKEN }}
-
-
     - name: 将包修改添加到发布
       uses: irongut/EditRelease@v1.2.0
       with:
-        prerelease: true
         token: ${{ secrets.GITHUB_TOKEN }}
         id: ${{ github.event.release.id }}
         body: "Released to GitHub Packages."
-
-    
-    
+        
+ 
