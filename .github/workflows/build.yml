@@ -29,11 +29,43 @@ jobs:
     - name: 构建
       run: dotnet build ConsoleApp1.sln --configuration Release --no-restore
         
-    - name: 测试
-      run: dotnet test ConsoleApp1.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+    - name: CI Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Plugin
+        path: |
+            ./ConsoleApp1/bin/Debug/net6.0/
+            
+    - name: CI Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: NuGet Package
+        path: |
+            ./ConsoleApp1/bin/Debug/*.symbols.nupkg
+        
+    - name: 下载 Artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: release-nuget
 
-    - name: 复制测试 Details
-      run: cp coverage/**/coverage.cobertura.xml coverage/coverage.cobertura.xml
+    - name: 安装 Nuget
+      uses: NuGet/setup-nuget@v1.0.5
+      with:
+        nuget-version: latest
+
+    - name: 添加 GitHub 包 source
+      run: nuget sources Add -Name GitHub -Source ${{env.GITHUB_PACKAGE_URL}} -UserName ${{ github.repository_owner }} -Password ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 推送 to GitHub 包
+      run: nuget push **/*.nupkg -source GitHub -SkipDuplicate
+        
+        
+    - name: Set env output and package
+      id: setenvo
+      run: |
+          Copy-Item ./ConsoleApp1/bin/Debug/net6.0/* ./
+          Compress-Archive -Path ConsoleApp1.*,aaa.txt,README.md Artifact.zip
+
 
     - name: Create Test Report
       uses: irongut/CodeCoverageSummary@v1.2.0
@@ -73,18 +105,4 @@ jobs:
        overwrite: true
        body: "This is my release text"
 
-    - name: 下载 Artifacts
-      uses: actions/download-artifact@v2
-      with:
-        name: release-nuget
 
-    - name: 安装 Nuget
-      uses: NuGet/setup-nuget@v1.0.5
-      with:
-        nuget-version: latest
-
-    - name: 添加 GitHub 包 source
-      run: nuget sources Add -Name GitHub -Source ${{env.GITHUB_PACKAGE_URL}} -UserName ${{ github.repository_owner }} -Password ${{ secrets.GITHUB_TOKEN }}
-
-    - name: 推送 to GitHub 包
-      run: nuget push **/*.nupkg -source GitHub -SkipDuplicate
