@@ -39,16 +39,16 @@ jobs:
       - name: Build
         run: |
           cd ConsoleApp1
-          dotnet publish -f net6.0 -p:PublishSingleFile=true --self-contained false
+          dotnet publish -r win-x64 -f net6.0 -c Release -p:PublishSingleFile=true --self-contained false
 
       #dotnet build
         
       - name: CI Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Test
+          name: Test-win-x64-Release
           path: |
-              ConsoleApp1/bin/Debug/net6.0/
+              ConsoleApp1/bin/Release/net6.0/win-x64/publish/
           #  ./ConsoleApp1/bin/Debug/net6.0/
 
 
