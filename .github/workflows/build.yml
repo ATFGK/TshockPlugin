@@ -3,13 +3,15 @@ name: Build + Deploy
 on: 
   release:
     types: [prereleased]
+
+defaults:
+  run:
+    shell: pwsh
     
-env:
-  GITHUB_PACKAGE_URL: 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json'
-  
 jobs:
   build:
     runs-on: ubuntu-latest
+    
     name: 资源构建
     steps:
     - name: 校验
@@ -45,6 +47,7 @@ jobs:
     - name: Set env output and package
       id: setenvo
       run: |
+          Copy-Item ./src/bin/Debug/net6.0/* ./
           Compress-Archive -Path ConsoleApp1.*,aaa.txt,README.md Artifact.zip
 
         
