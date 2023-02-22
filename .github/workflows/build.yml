@@ -42,13 +42,9 @@ jobs:
         path: |
             ./ConsoleApp1/bin/Debug/*.symbols.nupkg
         
-
-        
     - name: Set env output and package
       id: setenvo
       run: |
-          dotnet nuget push ConsoleApp1/bin/Debug/*.symbols.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
-          echo "TAG_NAME=$(git rev-list --count HEAD)" >> $env:GITHUB_OUTPUT
           Copy-Item ./ConsoleApp1/bin/Debug/net6.0/* ./
           Compress-Archive -Path ConsoleApp1.*,aaa.txt,README.md Artifact.zip
 
