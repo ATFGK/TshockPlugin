@@ -1,27 +1,25 @@
+name: "pre-release"
+
 on:
-  release:
-    types: [created] # 表示在创建新的 Release 时触发
+  push:
+    branches:
+      - "master"
     
 jobs:
   pre-release:
     name: "Pre Release"
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        goos: [linux, windows, darwin] # 需要打包的系统
-        goarch: [amd64, arm64] # 需要打包的架构
-        exclude: # 排除某些平台和架构
-          - goarch: arm64
-            goos: darwin
+    runs-on: "ubuntu-latest"
+
     steps:
+      # ...
       - name: "Build & test"
+
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: true
           title: "Development Build"
-          binary_name: "啊啊啊啊" # 可以指定二进制文件的名称
           files: |
             LICENSE.txt
             aaa.txt
