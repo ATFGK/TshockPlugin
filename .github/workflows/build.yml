@@ -69,7 +69,7 @@ jobs:
        #body: "2"
      - name: 将包修改添加到发布
        uses: irongut/EditRelease@v1.2.0
-       if: github.event_name == 'prereleased'
+       if: ${{ github.event_name == 'prereleased' }}
        with:
         token: ${{ secrets.GITHUB_TOKEN }}
         id: ${{ github.event.release.id }}
