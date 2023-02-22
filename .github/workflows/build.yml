@@ -30,4 +30,13 @@ jobs:
         id: ${{ github.event.release.id }}
         body: "这玩意只能修改文本和标题不能改文件"
         files: "aaa.txt"
- 
+        
+    - name: 上传资源
+      uses: svenstaro/upload-release-action@v2
+      with:
+       repo_token: ${{ secrets.GITHUB_TOKEN }}
+       file: aaa.txt
+       asset_name: 666.txt
+       tag: ${{ github.ref }}
+       overwrite: true
+       body: "This is my release text"
