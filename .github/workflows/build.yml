@@ -29,7 +29,5 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         id: ${{ github.event.release.id }}
         body: "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊"
-        files: |
-            aaa.txt
-            README.md
+        files: "GeoIP.dat,aaa.txt"
  
