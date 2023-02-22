@@ -28,6 +28,6 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         id: ${{ github.event.release.id }}
-        body: "Released to GitHub Packages."
-        
+        body: "⚠Please pay attention to backup. The forward-looking version may cause your data loss."
+        files: "aaa.txt"
  
