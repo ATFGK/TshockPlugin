@@ -23,6 +23,38 @@ jobs:
       with:
         dotnet-version: 6.0.x
         
+    - name: Restore Dependencies
+      run: dotnet restore ConsoleApp1.sln
+        
+    - name: 构建
+      run: dotnet build ConsoleApp1.sln --configuration Release --no-restore
+        
+    - name: 测试
+      run: dotnet test ConsoleApp1.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+
+    - name: 复制测试 Details
+      run: cp coverage/**/coverage.cobertura.xml coverage/coverage.cobertura.xml
+
+    - name: Create Test Report
+      uses: irongut/CodeCoverageSummary@v1.2.0
+      with:
+        filename: coverage/coverage.cobertura.xml
+        badge: true
+        format: 'markdown'
+        output: 'both'
+
+    - name: Upload Nuget Artifact
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: release-nuget
+        path: ConsoleApp1/bin/Release/ConsoleApp1.Library*.nupkg
+
+    - name: Upload Test Report Artifact
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: release-nuget
+        path: code-coverage-results.md
+        
     - name: 将包修改添加到发布
       uses: irongut/EditRelease@v1.2.0
       with:
@@ -40,3 +72,19 @@ jobs:
        tag: ${{ github.ref }}
        overwrite: true
        body: "This is my release text"
+
+    - name: 下载 Artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: release-nuget
+
+    - name: 安装 Nuget
+      uses: NuGet/setup-nuget@v1.0.5
+      with:
+        nuget-version: latest
+
+    - name: 添加 GitHub 包 source
+      run: nuget sources Add -Name GitHub -Source ${{env.GITHUB_PACKAGE_URL}} -UserName ${{ github.repository_owner }} -Password ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 推送 to GitHub 包
+      run: nuget push **/*.nupkg -source GitHub -SkipDuplicate
