@@ -2,61 +2,50 @@ name: Main
 
 on: 
   release:
-    types: [created]
+    types: [prereleased]
 
-defaults:
-  run:
-    shell: pwsh
-
+env:
+  GITHUB_PACKAGE_URL: 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json'
+  
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    name: 资源构建
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          submodules: 'recursive'
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+        
+  deploy:
+    name: 部署到GitHub包
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+    - name: 下载组件
+      uses: actions/download-artifact@v2
+      with:
+        name: release-nuget
 
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '6.0.100'
+    - name: 设置Nuget
+      uses: NuGet/setup-nuget@v1.0.5
+      with:
+        nuget-version: latest
 
-      - name: Build
-        run: |
-          cd src
-          dotnet build
-      - name: CI Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: Plugin
-          path: |
-            ./src/bin/Debug/net6.0/
-      - name: CI Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: NuGet Package
-          path: |
-            ./src/bin/Debug/*.symbols.nupkg
-            
-      - name: Set env output and package
-        id: setenvo
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        run: |
-          dotnet nuget push src/bin/Debug/*.symbols.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
-          echo "TAG_NAME=$(git rev-list --count HEAD)" >> $env:GITHUB_OUTPUT
-          Copy-Item ./src/bin/Debug/net6.0/* ./
-          tar cvf Artifact.tar Chireiden.TShock.Omni.* LICENSE.txt,aaa.txt README.md
-          Compress-Archive -Path Chireiden.TShock.Omni.*,LICENSE.txt,aaa.txt,README.md Artifact.zip
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        with:
-          prerelease: true
-          tag_name: v${{ steps.setenvo.outputs.TAG_NAME }}
-          name: Release v${{ steps.setenvo.outputs.TAG_NAME }}
-          files: |
-            Artifact.tar
-            Artifact.zip
+    - name: 添加GitHub包源
+      run: nuget sources Add -Name GitHub -Source ${{env.GITHUB_PACKAGE_URL}} -UserName ${{ github.repository_owner }} -Password ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 推送到GitHub包
+      run: nuget push **/*.txt -source GitHub -SkipDuplicate
+
+    - name: 将测试报告添加到发布
+      uses: irongut/EditRelease@v1.2.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        id: ${{ github.event.release.id }}
+        body: "Released to GitHub Packages."
+        files: "aaa.txt"
