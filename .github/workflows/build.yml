@@ -1,9 +1,9 @@
-name: Main
+name: Build + Deploy
 
 on: 
   release:
     types: [prereleased]
-
+    
 env:
   GITHUB_PACKAGE_URL: 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json'
   
@@ -12,26 +12,37 @@ jobs:
     runs-on: ubuntu-latest
     name: 资源构建
     steps:
-    - name: Checkout
+    - name: 校验
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: Setup .NET
+        submodules: 'recursive'
+
+    - name: 安装.NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: 6.0.x
+        
+    - name: 打包
+      id: setenvo
+      run: |
+          dotnet nuget push src/bin/Debug/*.symbols.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+          echo "TAG_NAME=$(git rev-list --count HEAD)" >> $env:GITHUB_OUTPUT
+          Copy-Item ./src/bin/Debug/net6.0/* ./
+          tar cvf Artifact.tar LICENSE.txt aaa.txt
+          Compress-Archive -Path LICENSE.txt,aaa.txt Artifact.zip
         
   deploy:
     name: 部署到GitHub包
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-    - name: 下载组件
+    - name: 下载工件
       uses: actions/download-artifact@v2
       with:
         name: release-nuget
 
-    - name: 设置Nuget
+    - name: 安装Nuget
       uses: NuGet/setup-nuget@v1.0.5
       with:
         nuget-version: latest
@@ -42,10 +53,13 @@ jobs:
     - name: 推送到GitHub包
       run: nuget push **/*.txt -source GitHub -SkipDuplicate
 
-    - name: 将测试报告添加到发布
+    - name: 将包添加到发布
       uses: irongut/EditRelease@v1.2.0
       with:
+        prerelease: true
         token: ${{ secrets.GITHUB_TOKEN }}
         id: ${{ github.event.release.id }}
         body: "Released to GitHub Packages."
         files: "aaa.txt"
+    
+    
