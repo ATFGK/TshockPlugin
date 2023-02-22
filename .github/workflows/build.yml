@@ -28,6 +28,6 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         id: ${{ github.event.release.id }}
-        body: "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊"
-        files: "GeoIP.dat,aaa.txt"
+        body: "这玩意只能修改文本和标题不能改文件"
+        files: "aaa.txt"
  
