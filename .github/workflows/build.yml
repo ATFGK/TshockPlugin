@@ -23,15 +23,6 @@ jobs:
       with:
         dotnet-version: 6.0.x
         
-    - name: 打包
-      id: setenvo
-      run: |
-          dotnet nuget push src/bin/Debug/*.symbols.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
-          echo "TAG_NAME=$(git rev-list --count HEAD)" >> $env:GITHUB_OUTPUT
-          Copy-Item ./src/bin/Debug/net6.0/* ./
-          tar cvf Artifact.tar LICENSE.txt aaa.txt
-          Compress-Archive -Path LICENSE.txt,aaa.txt Artifact.zip
-        
   deploy:
     name: 部署到GitHub包
     needs: [build]
