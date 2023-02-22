@@ -14,66 +14,65 @@ jobs:
     
     name: 资源构建
     steps:
-    - name: 校验
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        submodules: 'recursive'
+     - uses: actions/checkout@v3
+       with:
+          submodules: 'recursive'
 
-    - name: 安装.NET
-      uses: actions/setup-dotnet@v1
-      with:
+     - name: 安装.NET
+       uses: actions/setup-dotnet@v1
+       with:
         dotnet-version: '6.0.100'
         
-    - name: Build
-      run: |
-        cd ConsoleApp1
-        dotnet build
+     - name: Build
+       run: |
+          cd ConsoleApp1
+          dotnet publish -r win-x64 -f net6.0 -c Release -p:PublishSingleFile=true --self-contained false
+      #cd ConsoleApp1
+      #dotnet build
         
-    - name: CI Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: Plugin
-        path: |
-            ./ConsoleApp1/bin/Debug/net6.0/
-            
-    - name: CI Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: NuGet Package
-        path: |
-            ./ConsoleApp1/bin/Debug/*.symbols.nupkg
+     #- name: CI Artifact
+       #uses: actions/upload-artifact@v3
+       #with:
+         #name: Release
+         #path: |
+            #ConsoleApp1/bin/Release/net6.0/win-x64/publish/
+            #这是附带资源的，用处不大，直接不要了（在测试中使用）
+     #- name: CI Artifact
+      #uses: actions/upload-artifact@v3
+      #with:
+        #name: NuGet Package
+        #path: |
+            #./ConsoleApp1/bin/Debug/*.symbols.nupkg
         
-    - name: Set env output and package
-      id: setenvo
-      run: |
-          Compress-Archive -Path ./ConsoleApp1/bin/Debug/net6.0/*.*,aaa.txt,README.md Artifact.zip
+     - name: 打包
+      #id: setenvo
+       run: |
+          Compress-Archive -Path ./ConsoleApp1/bin/Release/net6.0/win-x64/publish/*.*,aaa.txt,README.md Release-win-x64.zip
 
         
-    - name: 将包修改添加到发布
-      uses: irongut/EditRelease@v1.2.0
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        id: ${{ github.event.release.id }}
-        body: "这玩意只能修改文本和标题不能改文件"
-        files: "aaa.txt"
+     #- name: 将包修改添加到发布
+       #uses: irongut/EditRelease@v1.2.0
+       #with:
+        #token: ${{ secrets.GITHUB_TOKEN }}
+        #id: ${{ github.event.release.id }}
+        #body: "这玩意只能修改文本和标题不能改文件"
+        #files: "aaa.txt"
         
-    - name: 上传资源
-      uses: svenstaro/upload-release-action@v2
-      with:
-       repo_token: ${{ secrets.GITHUB_TOKEN }}
-       file: aaa.txt
-       asset_name: 666.txt
-       tag: ${{ github.ref }}
-       overwrite: true
-       body: "2"
+    #- name: 上传资源
+      #uses: svenstaro/upload-release-action@v2
+      #with:
+       #repo_token: ${{ secrets.GITHUB_TOKEN }}
+       #file: aaa.txt
+       #asset_name: 666.txt
+       #tag: ${{ github.ref }}
+       #overwrite: true
+       #body: "2"
        
-    - name: 上传资源
-      uses: svenstaro/upload-release-action@v2
-      with:
-       repo_token: ${{ secrets.GITHUB_TOKEN }}
-       file: Artifact.zip
-       tag: ${{ github.ref }}
-       overwrite: true
-       body: "7"
+     - name: 上传资源
+       uses: svenstaro/upload-release-action@v2
+       with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: Release-win-x64.zip
+        tag: ${{ github.ref }}
+        overwrite: true
 
