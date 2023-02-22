@@ -75,4 +75,12 @@ jobs:
         file: Release-win-x64.zip
         tag: ${{ github.ref }}
         overwrite: true
+        
+     #- name: 添加更新日志
+       #uses: irongut/EditRelease@v1.2.0
+       #with:
+        #token: ${{ secrets.GITHUB_TOKEN }}
+        #id: ${{ github.event.release.id }}
+        #files: "changelog.md"
+        
 
