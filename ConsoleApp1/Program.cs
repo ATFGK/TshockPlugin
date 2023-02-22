@@ -16,11 +16,6 @@ namespace ConsoleApp1
             Console.WriteLine(Hash_MD5_32("林祁1"));
 
             Console.WriteLine(Math.Atan2(1, 0));//y,x
-
-
-
-
-
             var bytes = Encoding.UTF8.GetBytes("🔒");//将其转为utf8格式
             var base64 = Convert.ToBase64String(bytes);//转为B64
             Console.WriteLine("BU8:"+base64);
