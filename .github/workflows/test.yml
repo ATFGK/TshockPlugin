@@ -44,7 +44,7 @@ jobs:
       - name: CI Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Text
+          name: Test
           path: |
             ./ConsoleApp1/bin/Debug/net6.0/
 
