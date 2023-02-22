@@ -23,6 +23,13 @@ jobs:
       with:
         dotnet-version: 6.0.x
         
+        
+    - name: 上传项目
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: release-nuget
+        path: aaa.txt
+        
   deploy:
     name: 部署到GitHub包
     needs: [build]
