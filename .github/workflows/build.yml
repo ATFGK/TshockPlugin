@@ -28,6 +28,6 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         id: ${{ github.event.release.id }}
-        body: "⚠Please pay attention to backup. The forward-looking version may cause your data loss."
+        body: "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊"
         files: "aaa.txt,README.md"
  
