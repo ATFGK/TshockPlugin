@@ -42,7 +42,12 @@ jobs:
           dotnet publish -r win-x64 -f net6.0 -c Release -p:PublishSingleFile=true --self-contained false
 
       #dotnet build
-        
+
+
+      - name: 复制文件
+        run: |
+            cp aaa.txt ConsoleApp1/bin/Release/net6.0/win-x64/publish/
+
       - name: CI Artifact
         uses: actions/upload-artifact@v3
         with:
